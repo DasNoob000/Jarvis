@@ -1,0 +1,103 @@
+# Jarvis configuration.
+#
+# This file is copied to your user config directory on first run:
+#   macOS    ~/Library/Application Support/Jarvis/jarvis.toml
+#   Windows  %APPDATA%\Jarvis\jarvis.toml
+#
+# Edit the copy, not this file. "Reveal Config File" in the menu opens it.
+#
+# Your Anthropic API key does NOT go here. See [llm] below.
+
+[general]
+# Path to the file holding Jarvis's system prompt / personality. Relative paths are
+# resolved against this config file's directory.
+personality_file = "personality.txt"
+log_level = "INFO"          # DEBUG | INFO | WARNING | ERROR
+
+
+[audio]
+input_device = ""           # "" = system default. Run `jarvis-dev devices` to list.
+sample_rate = 16000
+frame_ms = 20               # 10, 20 or 30 — webrtcvad accepts nothing else
+
+
+[clap]
+# Double-clap wake trigger. Expect to tune these against your own room:
+#   jarvis-dev clap-tune
+enabled = true
+threshold = 0.35            # onset strength, 0..1. Lower = more sensitive.
+min_gap_ms = 120            # two claps closer together than this are one event
+max_gap_ms = 700            # ...further apart than this are two separate events
+refractory_ms = 1500        # ignore everything for this long after a successful wake
+highpass_hz = 2000          # claps are broadband; speech and rumble are not
+
+
+[stt]
+backend = "faster_whisper"  # faster_whisper | cloud
+model = "small.en"          # tiny.en | base.en | small.en | medium.en | large-v3
+device = "auto"             # auto | cpu | cuda
+compute_type = "auto"       # auto | int8 | float16 | float32
+language = "en"
+max_utterance_s = 30.0      # hard stop, so a stuck VAD can't record forever
+
+
+[cancel]
+# Spoken mid-action to abort whatever Jarvis is doing. Matched case-insensitively
+# against the transcript; any phrase in the list triggers a cancel.
+phrases = ["cancel", "stop jarvis", "belay that"]
+model = "tiny.en"           # separate small model, kept warm for low latency
+enabled = true
+
+
+[llm]
+# The API key is read from, in order:
+#   1. the ANTHROPIC_API_KEY environment variable
+#   2. your OS keychain  (service "Jarvis", account "anthropic_api_key")
+#   3. an `ant auth login` profile, resolved by the SDK itself
+# It is deliberately impossible to put it in this file.
+model = "claude-opus-5"
+effort = "low"              # low | medium | high | xhigh | max — low keeps replies snappy
+max_tokens = 4096
+history_turns = 12          # conversation turns kept in context
+
+# Fast mode: same model, up to ~2.5x output tokens/sec, premium pricing
+# ($10/$50 per MTok vs $5/$25). Claude Opus 5 only.
+fast_mode = false
+
+# Let the server transparently reroute if a request is refused, instead of Jarvis
+# falling silent. Costs nothing when unused.
+refusal_fallbacks = true
+
+
+[tts]
+backend = "system"          # system | elevenlabs | piper
+voice = ""                  # "" = OS default. macOS: "Daniel" is the closest to Jarvis.
+rate = 190                  # words per minute (system backend only)
+
+[tts.elevenlabs]
+# Key read from ELEVENLABS_API_KEY or the keychain, same as above.
+voice_id = ""
+model_id = "eleven_turbo_v2_5"
+
+[tts.piper]
+model_path = ""             # path to a .onnx voice
+
+
+[startup]
+# Runs when Jarvis launches. Leave enabled = false until you've tried it manually.
+enabled = false
+order = "prompt_first"      # prompt_first | open_first
+prompt = "Good morning. Give me a two-sentence summary of anything I should know today."
+open = [
+    # "Safari",
+    # "https://news.ycombinator.com",
+]
+
+
+[actions]
+# Narrow, named actions are always available. A general AppleScript escape hatch is
+# arbitrary code execution driven by an LLM, so it is off by default and allowlisted
+# by script name when on.
+allow_automation = false
+automation_allowlist = []
+search_engine = "https://duckduckgo.com/?q={query}"

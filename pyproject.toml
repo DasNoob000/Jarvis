@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jarvis"
+version = "0.1.0"
+description = "A voice assistant with a menu-bar presence, in the manner of Jarvis."
+requires-python = ">=3.11"
+dependencies = [
+    # --- Core, all platforms ---
+    "anthropic>=1.0,<2",
+    "pydantic>=2.7",
+    "tomli-w>=1.0",
+    "pillow>=10.0",
+    "httpx>=0.27",
+    "keyring>=25.0",
+
+    # --- Audio (Phase 2) ---
+    "sounddevice>=0.4.6",
+    "numpy>=1.26",
+    "webrtcvad-wheels>=2.0.14",
+    "faster-whisper>=1.1",
+]
+
+[project.optional-dependencies]
+macos = [
+    "rumps>=0.4.0",
+    "pyobjc-framework-Cocoa>=10.0",
+    "pyobjc-framework-Quartz>=10.0",            # CGPreflightScreenCaptureAccess
+    "pyobjc-framework-AVFoundation>=10.0",      # microphone authorisation status
+    "pyobjc-framework-ApplicationServices>=10.0",  # AXIsProcessTrusted
+]
+windows = [
+    "pystray>=0.19",
+    "mss>=9.0",
+    "pywin32>=306",
+]
+tts-elevenlabs = ["elevenlabs>=1.0"]
+tts-piper = ["piper-tts>=1.2"]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+]
+package-macos = ["py2app>=0.28"]
+
+[project.scripts]
+jarvis = "jarvis.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

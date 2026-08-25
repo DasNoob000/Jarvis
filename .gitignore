@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# py2app leftovers
+packaging/macos/build/
+packaging/macos/dist/
+
+# never commit a key
+.env

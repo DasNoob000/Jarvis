@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Reference copy of the LaunchAgent Jarvis installs.
+
+  You do not need to place this file yourself — "Start at Login" in the menu writes
+  it, with the paths filled in, to:
+
+      ~/Library/LaunchAgents/de.home-martin.jarvis.plist
+
+  and registers it with `launchctl bootstrap gui/$UID`. This copy is here so you can
+  see exactly what the toggle does, and hand-install it if you prefer.
+
+  Placeholders: {{PROGRAM}} is the bundle executable
+  (/Applications/Jarvis.app/Contents/MacOS/Jarvis), {{LOG_DIR}} is
+  ~/Library/Logs/Jarvis.
+
+  Manual install:
+      launchctl bootstrap gui/$UID ~/Library/LaunchAgents/de.home-martin.jarvis.plist
+  Manual removal:
+      launchctl bootout gui/$UID/de.home-martin.jarvis
+      rm ~/Library/LaunchAgents/de.home-martin.jarvis.plist
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>de.home-martin.jarvis</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{PROGRAM}}</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Jarvis is not a daemon. If you quit it, it stays quit until next login. -->
+    <key>KeepAlive</key>
+    <false/>
+
+    <!-- Tells launchd this is a foreground-ish app, so it is not throttled like a
+         background maintenance job. -->
+    <key>ProcessType</key>
+    <string>Interactive</string>
+
+    <key>StandardOutPath</key>
+    <string>{{LOG_DIR}}/launchagent.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>{{LOG_DIR}}/launchagent.err.log</string>
+</dict>
+</plist>
